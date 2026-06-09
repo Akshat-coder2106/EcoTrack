@@ -1,0 +1,14 @@
+[
+  { "id": "user", "source": "You (Direct)", "factor": 0, "unit": "kg", "category": "user", "dependencies": ["laptop_mfg", "beef_prod", "grid_power"] },
+  { "id": "laptop_mfg", "source": "Laptop Manufacturing", "factor": 250, "unit": "kg/unit", "category": "goods", "dependencies": ["silicon_mining", "logistics"] },
+  { "id": "silicon_mining", "source": "Silicon Mining", "factor": 50, "unit": "kg/kg", "category": "raw_materials", "dependencies": [] },
+  { "id": "logistics", "source": "Global Shipping", "factor": 0.05, "unit": "kg/km", "category": "transport", "dependencies": ["fossil_fuels"] },
+  { "id": "beef_prod", "source": "Beef Production", "factor": 27, "unit": "kg/kg", "category": "food", "dependencies": ["agriculture_feed", "methane_emissions"] },
+  { "id": "agriculture_feed", "source": "Livestock Feed", "factor": 2, "unit": "kg/kg", "category": "agriculture", "dependencies": ["fertilizer"] },
+  { "id": "methane_emissions", "source": "Methane Offgassing", "factor": 25, "unit": "kg_co2e/kg", "category": "emissions", "dependencies": [] },
+  { "id": "fertilizer", "source": "Synthetic Fertilizer", "factor": 3, "unit": "kg/kg", "category": "chemicals", "dependencies": ["fossil_fuels"] },
+  { "id": "grid_power", "source": "Grid Electricity", "factor": 0.4, "unit": "kg/kWh", "category": "energy", "dependencies": ["coal_plant", "renewables"] },
+  { "id": "coal_plant", "source": "Coal Generation", "factor": 1.0, "unit": "kg/kWh", "category": "energy", "dependencies": ["fossil_fuels"] },
+  { "id": "renewables", "source": "Renewable Energy", "factor": 0.05, "unit": "kg/kWh", "category": "energy", "dependencies": [] },
+  { "id": "fossil_fuels", "source": "Fossil Extraction", "factor": 0.5, "unit": "kg/L", "category": "raw_materials", "dependencies": [] }
+]

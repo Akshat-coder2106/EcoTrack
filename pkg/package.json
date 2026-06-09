@@ -1,0 +1,15 @@
+{
+  "name": "carbon-engine",
+  "type": "module",
+  "version": "0.1.0",
+  "files": [
+    "carbon_engine_bg.wasm",
+    "carbon_engine.js",
+    "carbon_engine.d.ts"
+  ],
+  "main": "carbon_engine.js",
+  "types": "carbon_engine.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}

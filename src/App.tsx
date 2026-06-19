@@ -146,7 +146,7 @@ function App() {
       <Layout
         commandBar={
           <ErrorBoundary>
-            <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+            <div className="app-layout-wrapper">
               <CommandBar 
                 inputText={inputText}
                 setInputText={setInputText}
@@ -155,14 +155,7 @@ function App() {
                 noaaPpm={noaaPpm}
               />
             {submitError && (
-              <div style={{ 
-                background: 'rgba(239,68,68,0.1)', 
-                borderBottom: '1px solid var(--danger-color)',
-                color: 'var(--danger-color)',
-                padding: '8px 24px',
-                fontSize: '0.85rem',
-                textAlign: 'center'
-              }}>
+              <div className="app-error-banner">
                 {submitError}
               </div>
             )}
@@ -173,14 +166,14 @@ function App() {
         intelligencePanelLeft={
           <ErrorBoundary>
             <Suspense fallback={
-              <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
-                Loading graph...
+              <div className="app-loading-state">
+                Loading supply chain graph...
               </div>
             }>
               {supplyChainData.length > 0 ? (
                 <Scope3Graph data={supplyChainData} />
               ) : (
-                <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                <div className="app-loading-state">
                   Loading graph data...
                 </div>
               )}
@@ -194,7 +187,7 @@ function App() {
             </ErrorBoundary>
             <ErrorBoundary>
               <Suspense fallback={
-                <div style={{ padding: '1rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                <div className="app-loading-state-small">
                   Loading insights...
                 </div>
               }>

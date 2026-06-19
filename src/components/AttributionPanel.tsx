@@ -44,13 +44,13 @@ export const AttributionPanel: React.FC<AttributionPanelProps> = ({ history, nar
   };
 
   return (
-    <div className="glass-panel" style={{ display: 'flex', flexDirection: 'column', gap: '24px', padding: '24px' }}>
+    <div className="glass-panel attribution-panel-container">
       <h3 className="text-section-header">Carbon Intelligence</h3>
 
       {/* Top Source Bar Chart */}
       {history.length > 0 && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-secondary)' }}>
+        <div className="attribution-chart-wrapper">
+          <div className="text-caption">
             Emissions by Category
           </div>
           <div style={{ minHeight: '140px', height: Math.max(140, categoryBreakdown.length * 40), width: '100%' }}>
@@ -135,13 +135,13 @@ export const AttributionPanel: React.FC<AttributionPanelProps> = ({ history, nar
               </BarChart>
             </ResponsiveContainer>
           </div>
-          <div style={{ display: 'flex', gap: '12px', marginTop: '8px', flexWrap: 'wrap' }}>
+          <div className="attribution-legend-container">
             {categoryBreakdown.map(entry => (
-              <div key={entry.category} style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                <span style={{ color: CATEGORY_COLORS[entry.category] || '#14b8a6', display: 'flex' }}>
+              <div key={entry.category} className="attribution-legend-item">
+                <span className="attribution-legend-icon" style={{ color: CATEGORY_COLORS[entry.category] || '#14b8a6' }}>
                   <CategoryIcon category={entry.category} size={12} />
                 </span>
-                <span style={{ textTransform: 'capitalize' }}>{entry.category}</span>
+                <span className="attribution-legend-text">{entry.category}</span>
               </div>
             ))}
           </div>
@@ -150,23 +150,16 @@ export const AttributionPanel: React.FC<AttributionPanelProps> = ({ history, nar
 
       {/* Counterfactual Box */}
       {narrative && (
-        <div style={{ 
-          borderLeft: '4px solid var(--accent-color)', 
-          background: 'rgba(16, 185, 129, 0.05)', 
-          padding: '16px',
-          fontStyle: 'italic',
-          color: 'var(--text-primary)',
-          lineHeight: 1.6
-        }}>
+        <div className="attribution-narrative-box">
           {narrative}
         </div>
       )}
 
       {/* Circular Progress Indicator */}
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', alignSelf: 'center', marginTop: '8px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ position: 'relative', width: '64px', height: '64px' }} role="meter" aria-valuenow={history.length > 0 ? Math.round(score) : 0} aria-valuemin={0} aria-valuemax={100} aria-label="Weekly sustainability score">
-            <svg viewBox="0 0 100 100" style={{ transform: 'rotate(-90deg)' }}>
+      <div className="attribution-score-container">
+        <div className="attribution-score-row">
+          <div className="attribution-score-meter" role="meter" aria-valuenow={history.length > 0 ? Math.round(score) : 0} aria-valuemin={0} aria-valuemax={100} aria-label="Weekly sustainability score">
+            <svg viewBox="0 0 100 100" className="attribution-score-svg">
               <circle cx="50" cy="50" r="45" fill="transparent" stroke="var(--border-color)" strokeWidth="8" />
               <circle 
                 cx="50" cy="50" r="45" 
@@ -178,14 +171,14 @@ export const AttributionPanel: React.FC<AttributionPanelProps> = ({ history, nar
                 style={{ transition: 'stroke-dasharray 1s ease-in-out' }}
               />
             </svg>
-            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}>
+            <div className="attribution-score-value">
               {history.length > 0 ? Math.round(score) : "—"}
             </div>
           </div>
           <div className="text-caption">Weekly Score</div>
         </div>
         {history.length > 0 && (
-          <div style={{ fontSize: '0.85rem', color: scoreColor, fontWeight: 500 }}>
+          <div className="attribution-score-verdict" style={{ color: scoreColor }}>
             {verdict}
           </div>
         )}

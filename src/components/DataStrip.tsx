@@ -79,97 +79,62 @@ export const DataStrip: React.FC<{ history: HistoryEntry[]; noaaPpm?: number }> 
         role="status" 
         aria-live="polite" 
         className="sr-only"
-        style={{ position: 'absolute', width: '1px', height: '1px', padding: 0, margin: '-1px', overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: 0 }}
       >
         Today's footprint is {totalEmissions} kg CO2. Week delta is {deltaPrefix}{weekDelta} kg. Top emission source is {topSource}. Global CO2 is {noaaText} PPM.
       </div>
 
       <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
-          gap: '1px',
-          background: 'var(--border-color)',
-        }}
+        className="data-strip-container"
         aria-hidden="true"
       >
-        <div style={{ background: 'var(--surface-color)', padding: '24px' }}>
-          <div className="text-caption" style={{ marginBottom: '16px' }}>
+        <div className="data-strip-card">
+          <div className="text-caption data-strip-card-title">
             Today's Footprint
           </div>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-            <span
-              style={{
-                fontSize: '2.5rem',
-                fontWeight: 700,
-                color: 'var(--text-primary)',
-              }}
-            >
+          <div className="data-strip-value-container">
+            <span className="data-strip-hero-value">
               {totalEmissions}
             </span>
-            <span className="text-body" style={{ color: 'var(--text-secondary)' }}>
+            <span className="text-body text-secondary">
               kg CO₂e
             </span>
           </div>
         </div>
 
-        <div style={{ background: 'var(--surface-color)', padding: '24px' }}>
-          <div className="text-caption" style={{ marginBottom: '16px' }}>
+        <div className="data-strip-card">
+          <div className="text-caption data-strip-card-title">
             Week Delta
           </div>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+          <div className="data-strip-value-container">
             <span
-              style={{
-                fontSize: '1.5rem',
-                fontWeight: 600,
-                color: deltaColor,
-              }}
+              className="data-strip-metric-value"
+              style={{ color: deltaColor }}
             >
               {weekDelta === 0 ? '0.0' : `${deltaPrefix}${weekDelta}`}
             </span>
-            <span className="text-body" style={{ color: 'var(--text-secondary)' }}>
+            <span className="text-body text-secondary">
               kg
             </span>
           </div>
-          <div
-            style={{
-              fontSize: '0.7rem',
-              color: 'var(--text-secondary)',
-              marginTop: '4px',
-              opacity: 0.7,
-            }}
-          >
+          <div className="data-strip-vs-text">
             vs last week
           </div>
         </div>
 
-        <div style={{ background: 'var(--surface-color)', padding: '24px' }}>
-          <div className="text-caption" style={{ marginBottom: '16px' }}>
+        <div className="data-strip-card">
+          <div className="text-caption data-strip-card-title">
             Top Emission Source
           </div>
-          <div
-            style={{
-              fontSize: '1.5rem',
-              fontWeight: 600,
-              color: 'var(--text-primary)',
-              textTransform: 'capitalize',
-            }}
-          >
+          <div className="data-strip-source-text">
             {topSource}
           </div>
         </div>
 
-        <div style={{ background: 'var(--surface-color)', padding: '24px' }}>
-          <div className="text-caption" style={{ marginBottom: '16px' }}>
+        <div className="data-strip-card">
+          <div className="text-caption data-strip-card-title">
             Global CO₂ PPM
           </div>
-          <div
-            style={{
-              fontSize: '1.5rem',
-              fontWeight: 600,
-              color: 'var(--danger-color)',
-            }}
-          >
+          <div className="data-strip-ppm-value">
             {noaaText}
           </div>
         </div>

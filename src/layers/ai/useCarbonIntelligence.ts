@@ -57,10 +57,26 @@ export const evaluateProgress = (history: HistoryEntry[]) => {
   return { score, verdict };
 };
 
+/**
+ * Custom React hook managing all AI-driven carbon tracking features.
+ * Connects to OpenRouter to parse NLP activity inputs and generate
+ * personalized reduction narratives.
+ * 
+ * @param apiKey - OpenRouter API key for authentication
+ * @returns Object containing parsing/narrative functions and state flags
+ */
 export const useCarbonIntelligence = (apiKey: string) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  /**
+   * Parses free-text activity strings into structured carbon data.
+   * Uses Anthropic Claude 3 Haiku via OpenRouter.
+   * 
+   * @param text - The raw activity text (e.g. "I drove 20 miles")
+   * @returns A promise resolving to the structured NLPParsedResult
+   * @throws Error if the API call fails or parsing is invalid
+   */
   const parseActivity = async (text: string): Promise<NLPParsedResult> => {
     setIsProcessing(true);
     setError(null);
@@ -105,6 +121,14 @@ export const useCarbonIntelligence = (apiKey: string) => {
     }
   };
 
+  /**
+   * Analyzes recent carbon history to generate a single actionable insight.
+   * Recommends counterfactual scenarios (e.g., "If you had... you would have saved...")
+   * 
+   * @param history - Array of recent user activities
+   * @param signal - Optional AbortSignal for request cancellation
+   * @returns A promise resolving to the generated narrative string
+   */
   const getAttributionNarrative = async (history: HistoryEntry[], signal?: AbortSignal) => {
     if (!history || history.length === 0) return "Not enough data yet.";
     

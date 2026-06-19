@@ -5,7 +5,9 @@ import { DataStrip } from './components/DataStrip';
 import { ActivityFeed } from './components/ActivityFeed';
 import { useCarbonIntelligence } from './layers/ai/useCarbonIntelligence';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { ApiKeyModal } from './components/ApiKeyModal';
 import { parseNoaaText, FALLBACK_PPM } from './utils/parseNoaa';
+import { getDemoData } from './constants/demoData';
 import init, { carbon_calc } from '../pkg/carbon_engine';
 import type { HistoryEntry, SupplyChainNode } from './types';
 import './index.css';
@@ -135,13 +137,7 @@ function App() {
   };
 
   const loadDemoData = () => {
-    const today = new Date().toISOString();
-    const yesterday = new Date(Date.now() - 86400000).toISOString();
-    setHistory([
-      { id: Date.now() + 1, date: today, activity: 'Drove 20 miles to work', category: 'transport', quantity: 32.18, unit: 'km', co2_kg: 8.4 },
-      { id: Date.now() + 2, date: today, activity: 'Ate a beef burger for lunch', category: 'food', quantity: 1, unit: 'meal', co2_kg: 4.2 },
-      { id: Date.now() + 3, date: yesterday, activity: 'Ran the AC all day', category: 'energy', quantity: 15, unit: 'kWh', co2_kg: 6.5 }
-    ]);
+    setHistory(getDemoData());
     setShowKeyModal(false);
   };
 
@@ -209,112 +205,12 @@ function App() {
         }
       />
 
-      {/* In-app API key modal — replaces native prompt() */}
-      {showKeyModal && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="api-key-modal-title"
-          onKeyDown={(e) => {
-            if (e.key === 'Escape') setShowKeyModal(false);
-            // Focus trap: keep Tab within modal
-            if (e.key === 'Tab') {
-              const modal = e.currentTarget;
-              const focusable = modal.querySelectorAll<HTMLElement>(
-                'input, button, [tabindex]:not([tabindex="-1"])'
-              );
-              const first = focusable[0];
-              const last = focusable[focusable.length - 1];
-              if (e.shiftKey && document.activeElement === first) {
-                e.preventDefault();
-                last?.focus();
-              } else if (!e.shiftKey && document.activeElement === last) {
-                e.preventDefault();
-                first?.focus();
-              }
-            }
-          }}
-          style={{
-            position: 'fixed', inset: 0, zIndex: 9999,
-            background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center'
-          }}
-        >
-          <div style={{
-            background: 'var(--surface-color)', 
-            backdropFilter: 'blur(12px)',
-            border: '1px solid var(--border-color)',
-            borderRadius: 'var(--border-radius-lg, 12px)', 
-            padding: '32px', 
-            maxWidth: '420px', 
-            width: '90%'
-          }}>
-            <h2 id="api-key-modal-title" className="text-section-header" style={{ margin: '0' }}>
-              OpenRouter API Key
-            </h2>
-            <p className="text-body" style={{ color: 'var(--text-secondary)', marginTop: '8px', marginBottom: '16px' }}>
-              Enter your OpenRouter API key to enable AI-powered activity parsing.
-            </p>
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              const input = (e.target as HTMLFormElement).elements.namedItem('key') as HTMLInputElement;
-              if (input.value.trim()) handleSaveKey(input.value.trim());
-            }}>
-              <label htmlFor="api-key-input" className="sr-only">API Key</label>
-              <input
-                id="api-key-input"
-                name="key"
-                type="password"
-                placeholder="sk-or-v1-..."
-                autoFocus
-                style={{
-                  width: '100%', 
-                  padding: '12px', 
-                  background: 'var(--bg-color)', 
-                  border: '1px solid var(--border-color)',
-                  borderRadius: '8px', 
-                  color: 'var(--text-primary)', 
-                  fontSize: '0.9rem'
-                }}
-              />
-              
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '12px' }}>
-                Don't have a key? Get a free one at{' '}
-                <a 
-                  href="https://openrouter.ai/keys" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  style={{ color: 'var(--accent-color)', textDecoration: 'none' }}
-                >
-                  openrouter.ai
-                </a>{' '}
-                in under a minute — no credit card required.
-              </p>
-
-              <div style={{ display: 'flex', gap: '12px', marginTop: '24px', justifyContent: 'flex-end', alignItems: 'center' }}>
-                <button type="button" onClick={loadDemoData} style={{
-                  background: 'transparent', border: 'none',
-                  color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '0.85rem', marginRight: 'auto', textDecoration: 'underline'
-                }}>
-                  Skip — load sample data
-                </button>
-                <button type="button" onClick={() => setShowKeyModal(false)} style={{
-                  padding: '8px 16px', background: 'transparent', border: '1px solid var(--border-color)',
-                  borderRadius: '8px', color: 'var(--text-secondary)', cursor: 'pointer'
-                }}>
-                  Cancel
-                </button>
-                <button type="submit" style={{
-                  padding: '8px 16px', background: 'var(--accent-color)', border: 'none',
-                  borderRadius: '8px', color: '#000', cursor: 'pointer', fontWeight: 600
-                }}>
-                  Save Key
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <ApiKeyModal
+        show={showKeyModal}
+        onClose={() => setShowKeyModal(false)}
+        onSave={handleSaveKey}
+        onDemoData={loadDemoData}
+      />
     </>
   );
 }

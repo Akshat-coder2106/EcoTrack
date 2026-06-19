@@ -1,10 +1,9 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, act, renderHook } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from '../App';
 import type { HistoryEntry } from '../types';
-import { renderHook } from '@testing-library/react';
 import { useCarbonIntelligence } from '../layers/ai/useCarbonIntelligence';
 import { DataStrip } from '../components/DataStrip';
 
@@ -134,7 +133,11 @@ describe('Core Pipeline Tests', () => {
     }));
 
     const { result } = renderHook(() => useCarbonIntelligence('test-key'));
-    const parsed = await result.current.parseActivity('I ate a burger');
+    
+    let parsed: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+    await act(async () => {
+      parsed = await result.current.parseActivity('I ate a burger');
+    });
     
     // Assert the returned object matches the expected schema exactly
     expect(parsed).toEqual({
@@ -152,7 +155,9 @@ describe('Core Pipeline Tests', () => {
       text: () => Promise.resolve('Unauthorized')
     }));
 
-    await expect(result.current.parseActivity('I ate a burger')).rejects.toThrow();
+    await act(async () => {
+      await expect(result.current.parseActivity('I ate a burger')).rejects.toThrow();
+    });
   });
 
   // TEST 4 - API key modal
@@ -192,5 +197,33 @@ describe('Core Pipeline Tests', () => {
 
     // Assert sessionStorage contains the key
     expect(window.sessionStorage.setItem).toHaveBeenCalledWith('ecotrack_api_key', 'new-api-key');
+  });
+
+  // TEST 5 - API key modal demo data fallback
+  it('loads demo data when requested', async () => {
+    Object.defineProperty(window, 'sessionStorage', {
+      value: { getItem: vi.fn(() => null), setItem: vi.fn(), clear: vi.fn() },
+      writable: true
+    });
+    
+    render(<App />);
+
+    // Try to submit without a key to open modal
+    const commandInput = screen.getByPlaceholderText(/I drove 40km/i);
+    await userEvent.type(commandInput, 'test activity');
+    const submitBtn = screen.getByRole('button', { name: /Submit/i });
+    await userEvent.click(submitBtn);
+
+    // Click demo data button
+    const demoBtn = await screen.findByText('Skip — load sample data');
+    await userEvent.click(demoBtn);
+
+    // Modal should close
+    await waitFor(() => {
+      expect(screen.queryByText('OpenRouter API Key')).toBeNull();
+    });
+
+    // History should be populated with demo data
+    expect(await screen.findByText(/Drove 20 miles to work/i)).toBeTruthy();
   });
 });

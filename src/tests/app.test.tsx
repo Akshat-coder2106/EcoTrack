@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from '../App';
+import type { HistoryEntry } from '../types';
 import { renderHook } from '@testing-library/react';
 import { useCarbonIntelligence } from '../layers/ai/useCarbonIntelligence';
 import { DataStrip } from '../components/DataStrip';
@@ -52,7 +53,7 @@ describe('Core Pipeline Tests', () => {
     });
     
     // Mock fetch globally to return a valid NLPParsedResult JSON
-    global.fetch = vi.fn().mockImplementation((url) => {
+    vi.stubGlobal('fetch', vi.fn().mockImplementation((url: string) => {
       if (url.includes('openrouter.ai')) {
         return Promise.resolve({
           ok: true,
@@ -74,7 +75,7 @@ describe('Core Pipeline Tests', () => {
         });
       }
       return Promise.reject(new Error('Unknown URL'));
-    });
+    }));
   });
 
   // TEST 1 - Activity submission pipeline
@@ -110,9 +111,9 @@ describe('Core Pipeline Tests', () => {
     const today = new Date().toISOString();
     const lastWeek = new Date(Date.now() - 7 * 86400000).toISOString();
     
-    const mockHistory = [
-      { id: 1, date: today, activity: 'drove', category: 'transport', quantity: 10, unit: 'km', co2_kg: 5.0 },
-      { id: 2, date: lastWeek, activity: 'drove', category: 'transport', quantity: 10, unit: 'km', co2_kg: 10.0 }
+    const mockHistory: HistoryEntry[] = [
+      { id: 1, date: today, activity: 'drove', category: 'transport' as const, quantity: 10, unit: 'km', co2_kg: 5.0 },
+      { id: 2, date: lastWeek, activity: 'drove', category: 'transport' as const, quantity: 10, unit: 'km', co2_kg: 10.0 }
     ];
 
     render(<DataStrip history={mockHistory} noaaPpm={420.00} />);
@@ -125,12 +126,12 @@ describe('Core Pipeline Tests', () => {
   it('parses activity correctly and throws on 401', async () => {
     // Call parseActivity("I ate a burger") with a mocked fetch that 
     // returns { category: "food", quantity: 1, unit: "meal", confidence: 0.9, activity: "ate a burger" }
-    global.fetch = vi.fn().mockResolvedValueOnce({
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce({
       ok: true,
       json: () => Promise.resolve({
         choices: [{ message: { content: '{"category":"food","quantity":1,"unit":"meal","confidence":0.9,"activity":"ate a burger"}' } }]
       })
-    });
+    }));
 
     const { result } = renderHook(() => useCarbonIntelligence('test-key'));
     const parsed = await result.current.parseActivity('I ate a burger');
@@ -145,11 +146,11 @@ describe('Core Pipeline Tests', () => {
     });
 
     // Assert that if fetch returns a 401 status, the function throws an error
-    global.fetch = vi.fn().mockResolvedValueOnce({
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce({
       ok: false,
       status: 401,
       text: () => Promise.resolve('Unauthorized')
-    });
+    }));
 
     await expect(result.current.parseActivity('I ate a burger')).rejects.toThrow();
   });

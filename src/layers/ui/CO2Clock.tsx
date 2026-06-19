@@ -7,7 +7,7 @@ export const CO2Clock: React.FC<{ initialPpm?: number; compact?: boolean }> = ({
   const [ppm, setPpm] = useState(initialPpm || FALLBACK_PPM);
   const [announcedPpm, setAnnouncedPpm] = useState(initialPpm || FALLBACK_PPM);
   const [tick, setTick] = useState(false);
-  const requestRef = useRef<number>();
+  const requestRef = useRef<number>(0);
   const lastTimeRef = useRef<number>(0);
 
   useEffect(() => {

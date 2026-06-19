@@ -104,13 +104,15 @@ export const Scope3Graph: React.FC<{ data: SupplyChainNode[] }> = ({ data }) => 
       .attr('role', 'button')
       .attr('aria-label', (d: GraphNode) => `${d.displayName || d.id}: ${d.factor} ${d.unit}`)
       .attr('style', 'cursor: pointer; transition: opacity 0.2s ease, transform 0.2s ease; transform-box: fill-box; transform-origin: center; outline: none;')
+      /* eslint-disable @typescript-eslint/no-explicit-any -- D3 drag generics don't match selection's BaseType union */
       .call(
         d3
-          .drag()
+          .drag<SVGCircleElement, GraphNode>()
           .on('start', dragstarted)
           .on('drag', dragged)
-          .on('end', dragended)
+          .on('end', dragended) as any
       );
+      /* eslint-enable @typescript-eslint/no-explicit-any */
 
     const linkedByIndex: Record<string, boolean> = {};
     graphLinks.forEach((d) => {
@@ -167,14 +169,14 @@ export const Scope3Graph: React.FC<{ data: SupplyChainNode[] }> = ({ data }) => 
           const tId = typeof l.target === 'object' ? l.target.id : l.target;
           return sId === d.id || tId === d.id ? 1 : 0.15;
         });
-        d3.select(event.target).attr('stroke', 'var(--accent-color)').attr('stroke-width', 4);
+        d3.select(event.currentTarget as Element).attr('stroke', 'var(--accent-color)').attr('stroke-width', 4);
       })
       .on('blur', (event) => {
         setTooltip(null);
         node.style('opacity', 1);
         node.style('transform', 'scale(1)');
         link.style('opacity', 0.6);
-        d3.select(event.target).attr('stroke', 'var(--bg-color)').attr('stroke-width', 2);
+        d3.select(event.currentTarget as Element).attr('stroke', 'var(--bg-color)').attr('stroke-width', 2);
       })
       .on('keydown', (event) => {
         if (event.key === 'Enter' || event.key === ' ') {

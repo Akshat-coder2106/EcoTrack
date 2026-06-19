@@ -43,7 +43,7 @@ export const evaluateProgress = (history: HistoryEntry[]) => {
   const WEIGHT_GOAL = 0.1;
   const NEUTRAL_BASELINE = 50;
 
-  const currentDelta = history.length > 1 ? (history[0].co2_kg - history[1].co2_kg) * -1 : 0;
+  const currentDelta = history.length > 1 ? ((history[0]?.co2_kg || 0) - (history[1]?.co2_kg || 0)) * -1 : 0;
   const consistency = history.length * 10;
   const goalProx = 50;
   const reward = (currentDelta * WEIGHT_DELTA) + (consistency * WEIGHT_CONSISTENCY) + (goalProx * WEIGHT_GOAL);
@@ -85,7 +85,6 @@ export const useCarbonIntelligence = (apiKey: string) => {
 
       if (!response.ok) {
         const errText = await response.text();
-        console.error("OpenRouter Error Body:", errText);
         throw new Error(`API returned ${response.status}: ${errText}`);
       }
 
@@ -99,7 +98,6 @@ export const useCarbonIntelligence = (apiKey: string) => {
       const parsed = JSON.parse(rawText);
       return validateParsedResult(parsed);
     } catch (err) {
-      console.error("AI Parse Error:", err);
       setError("Failed to parse your activity. Please try rephrasing.");
       throw err;
     } finally {
@@ -132,8 +130,6 @@ export const useCarbonIntelligence = (apiKey: string) => {
       });
 
       if (!response.ok) {
-        const errText = await response.text();
-        console.error("Narrative API Error:", response.status, errText);
         return "Track more activities to unlock personalized insights.";
       }
 
@@ -141,10 +137,8 @@ export const useCarbonIntelligence = (apiKey: string) => {
       return data.choices[0].message.content;
     } catch (err: unknown) {
       if (err instanceof Error && err.name === 'AbortError') {
-        console.log("Narrative request aborted");
         throw err;
       }
-      console.error('Narrative Error:', err);
       return "If you track your habits consistently, you'll discover massive savings opportunities.";
     }
   };

@@ -6,7 +6,7 @@ export const DataStrip: React.FC<{ history: HistoryEntry[]; noaaPpm?: number }> 
   noaaPpm,
 }) => {
   const totalEmissions = useMemo(() => {
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toISOString().split('T')[0] || '';
     return history
       .filter(item => item.date.startsWith(today))
       .reduce((sum, item) => sum + item.co2_kg, 0)
@@ -46,7 +46,7 @@ export const DataStrip: React.FC<{ history: HistoryEntry[]; noaaPpm?: number }> 
       const avg =
         history.slice(1).reduce((s, e) => s + e.co2_kg, 0) /
         (history.length - 1);
-      return Number((history[0].co2_kg - avg).toFixed(1));
+      return Number(((history[0]?.co2_kg || 0) - avg).toFixed(1));
     }
 
     return Number((thisWeek - lastWeek).toFixed(1));
@@ -60,7 +60,7 @@ export const DataStrip: React.FC<{ history: HistoryEntry[]; noaaPpm?: number }> 
     }, {});
     return Object.entries(totals).sort(
       (a: [string, number], b: [string, number]) => b[1] - a[1]
-    )[0][0];
+    )[0]?.[0] || 'None';
   }, [history]);
 
   const deltaColor =

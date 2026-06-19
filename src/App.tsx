@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, lazy, Suspense } from 'react';
+import { useEffect, useState, useRef, lazy, Suspense, FormEvent } from 'react';
 import { Layout } from './components/Layout';
 import { CommandBar } from './components/CommandBar';
 import { DataStrip } from './components/DataStrip';
@@ -34,13 +34,13 @@ function App() {
 
   useEffect(() => {
     // Initialize WASM once on mount
-    init().then(() => setWasmReady(true)).catch(console.error);
+    init().then(() => setWasmReady(true)).catch((err) => setSubmitError('WASM init failed: ' + err.message));
 
     // Load Supply Chain JSON
     fetch('/supply-chain.json')
       .then(res => res.json())
       .then((data: SupplyChainNode[]) => setSupplyChainData(data))
-      .catch(console.error);
+      .catch((err) => setSubmitError('Failed to load supply chain data: ' + err.message));
 
     // NOAA fetch with actual response parsing
     const fetchNoaa = async () => {
@@ -79,7 +79,7 @@ function App() {
         getAttributionNarrativeRef.current(history.slice(0, 10), signal)
           .then(setNarrative)
           .catch(err => {
-            if (err.name !== 'AbortError') console.error(err);
+            if (err.name !== 'AbortError') setSubmitError('Failed to fetch narrative: ' + err.message);
           });
       }, 2000);
     }
@@ -89,7 +89,7 @@ function App() {
     };
   }, [history, apiKey]);
 
-  const handleSubmitActivity = async (e: React.FormEvent) => {
+  const handleSubmitActivity = async (e: FormEvent) => {
     e.preventDefault();
     setSubmitError('');
     if (!inputText.trim()) {
@@ -123,7 +123,7 @@ function App() {
       setHistory(prev => [entry, ...prev]);
       setInputText('');
     } catch (err: unknown) {
-      console.error(err);
+
       setSubmitError(err instanceof Error ? err.message : 'Failed to process activity. Check your API key.');
     }
   };
@@ -131,6 +131,17 @@ function App() {
   const handleSaveKey = (key: string) => {
     setApiKey(key);
     sessionStorage.setItem('ecotrack_api_key', key);
+    setShowKeyModal(false);
+  };
+
+  const loadDemoData = () => {
+    const today = new Date().toISOString();
+    const yesterday = new Date(Date.now() - 86400000).toISOString();
+    setHistory([
+      { id: Date.now() + 1, date: today, activity: 'Drove 20 miles to work', category: 'transport', quantity: 32.18, unit: 'km', co2_kg: 8.4 },
+      { id: Date.now() + 2, date: today, activity: 'Ate a beef burger for lunch', category: 'food', quantity: 1, unit: 'meal', co2_kg: 4.2 },
+      { id: Date.now() + 3, date: yesterday, activity: 'Ran the AC all day', category: 'energy', quantity: 15, unit: 'kWh', co2_kg: 6.5 }
+    ]);
     setShowKeyModal(false);
   };
 
@@ -216,10 +227,10 @@ function App() {
               const last = focusable[focusable.length - 1];
               if (e.shiftKey && document.activeElement === first) {
                 e.preventDefault();
-                last.focus();
+                last?.focus();
               } else if (!e.shiftKey && document.activeElement === last) {
                 e.preventDefault();
-                first.focus();
+                first?.focus();
               }
             }
           }}
@@ -230,13 +241,18 @@ function App() {
           }}
         >
           <div style={{
-            background: 'var(--surface-color)', border: '1px solid var(--border-color)',
-            borderRadius: '12px', padding: '32px', maxWidth: '420px', width: '90%'
+            background: 'var(--surface-color)', 
+            backdropFilter: 'blur(12px)',
+            border: '1px solid var(--border-color)',
+            borderRadius: 'var(--border-radius-lg, 12px)', 
+            padding: '32px', 
+            maxWidth: '420px', 
+            width: '90%'
           }}>
-            <h2 id="api-key-modal-title" style={{ margin: '0 0 8px', fontSize: '1.125rem', color: 'var(--text-primary)' }}>
+            <h2 id="api-key-modal-title" className="text-section-header" style={{ margin: '0' }}>
               OpenRouter API Key
             </h2>
-            <p style={{ margin: '0 0 16px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+            <p className="text-body" style={{ color: 'var(--text-secondary)', marginTop: '8px', marginBottom: '16px' }}>
               Enter your OpenRouter API key to enable AI-powered activity parsing.
             </p>
             <form onSubmit={(e) => {
@@ -252,12 +268,36 @@ function App() {
                 placeholder="sk-or-v1-..."
                 autoFocus
                 style={{
-                  width: '100%', padding: '12px', marginBottom: '16px',
-                  background: 'var(--bg-color)', border: '1px solid var(--border-color)',
-                  borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.9rem'
+                  width: '100%', 
+                  padding: '12px', 
+                  background: 'var(--bg-color)', 
+                  border: '1px solid var(--border-color)',
+                  borderRadius: '8px', 
+                  color: 'var(--text-primary)', 
+                  fontSize: '0.9rem'
                 }}
               />
-              <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+              
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '12px' }}>
+                Don't have a key? Get a free one at{' '}
+                <a 
+                  href="https://openrouter.ai/keys" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  style={{ color: 'var(--accent-color)', textDecoration: 'none' }}
+                >
+                  openrouter.ai
+                </a>{' '}
+                in under a minute — no credit card required.
+              </p>
+
+              <div style={{ display: 'flex', gap: '12px', marginTop: '24px', justifyContent: 'flex-end', alignItems: 'center' }}>
+                <button type="button" onClick={loadDemoData} style={{
+                  background: 'transparent', border: 'none',
+                  color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '0.85rem', marginRight: 'auto', textDecoration: 'underline'
+                }}>
+                  Skip — load sample data
+                </button>
                 <button type="button" onClick={() => setShowKeyModal(false)} style={{
                   padding: '8px 16px', background: 'transparent', border: '1px solid var(--border-color)',
                   borderRadius: '8px', color: 'var(--text-secondary)', cursor: 'pointer'
@@ -266,7 +306,7 @@ function App() {
                 </button>
                 <button type="submit" style={{
                   padding: '8px 16px', background: 'var(--accent-color)', border: 'none',
-                  borderRadius: '8px', color: 'white', cursor: 'pointer', fontWeight: 600
+                  borderRadius: '8px', color: '#000', cursor: 'pointer', fontWeight: 600
                 }}>
                   Save Key
                 </button>

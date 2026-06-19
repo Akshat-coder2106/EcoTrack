@@ -31,7 +31,9 @@ export const AttributionPanel: React.FC<AttributionPanelProps> = ({ history, nar
     else { scoreColor = 'var(--accent-color)'; }
   }
 
-  const renderCustomYAxisTick = ({ x, y, payload }: { x: number; y: number; payload: { value: string } }) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Recharts tick props lack a stable exported type
+  const renderCustomYAxisTick = (props: Record<string, any>) => {
+    const { x, y, payload } = props as { x: number; y: number; payload: { value: string } };
     return (
       <g transform={`translate(${x},${y})`}>
         <text x={-20} y={4} dy={0} textAnchor="end" fill="var(--text-secondary)" fontSize={11} style={{ textTransform: 'capitalize' }}>
@@ -103,7 +105,8 @@ export const AttributionPanel: React.FC<AttributionPanelProps> = ({ history, nar
                     color: 'var(--text-primary)'
                   }}
                   itemStyle={{ color: 'var(--text-secondary)' }}
-                  formatter={(value: number) => [`${value.toFixed(2)} kg CO₂`, 'Emissions']}
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Recharts Formatter generic is overly broad
+                  formatter={(value: any) => [`${Number(value).toFixed(2)} kg CO₂`, 'Emissions']}
                 />
                 <Bar 
                   dataKey="total" 
@@ -112,7 +115,8 @@ export const AttributionPanel: React.FC<AttributionPanelProps> = ({ history, nar
                     position: 'right', 
                     fill: 'var(--text-secondary)', 
                     fontSize: 11,
-                    formatter: (v: number) => `${v.toFixed(1)}kg`
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Recharts LabelFormatter type mismatch
+                    formatter: (v: any) => `${Number(v).toFixed(1)}kg`
                   }}
                 >
                   <LabelList dataKey="category" position="insideLeft" 

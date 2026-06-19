@@ -14,10 +14,13 @@ export function parseNoaaText(rawText: string): number {
   if (lines.length === 0) return FALLBACK_PPM;
 
   const lastLine = lines[lines.length - 1];
+  if (!lastLine) return FALLBACK_PPM;
   const parts = lastLine.trim().split(/\s+/);
 
   // parts: [year, month, day, cycle, trend]
-  const ppmValue = parseFloat(parts[3]) || parseFloat(parts[4]);
+  const cycle = parts[3] || '';
+  const trend = parts[4] || '';
+  const ppmValue = parseFloat(cycle) || parseFloat(trend);
   
   if (!isNaN(ppmValue) && ppmValue >= 380 && ppmValue <= 450) {
     return ppmValue;

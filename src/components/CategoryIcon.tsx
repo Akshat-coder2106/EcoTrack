@@ -1,5 +1,4 @@
 import { Car, Utensils, Zap, Package } from 'lucide-react';
-import React from 'react';
 
 export const CategoryIcon = ({ category, size = 14 }: { category: string; size?: number }) => {
   switch (category) {

@@ -37,10 +37,10 @@ export const ApiKeyModal = ({ show, onClose, onSave, onDemoData }: ApiKeyModalPr
       }}
     >
       <div className="modal-content">
-        <h2 id="api-key-modal-title" className="text-section-header" style={{ margin: '0' }}>
+        <h2 id="api-key-modal-title" className="text-section-header modal-heading">
           OpenRouter API Key
         </h2>
-        <p className="text-body" style={{ marginTop: '8px', marginBottom: '16px' }}>
+        <p className="text-body modal-description">
           Enter your OpenRouter API key to enable AI-powered activity parsing.
         </p>
         <form onSubmit={(e: FormEvent) => {
@@ -58,13 +58,13 @@ export const ApiKeyModal = ({ show, onClose, onSave, onDemoData }: ApiKeyModalPr
             className="modal-input"
           />
           
-          <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+          <p className="modal-key-hint">
             Don't have a key? Get a free one at{' '}
             <a 
               href="https://openrouter.ai/keys" 
               target="_blank" 
               rel="noopener noreferrer"
-              style={{ color: 'var(--accent-color)', textDecoration: 'none' }}
+              className="modal-key-link"
             >
               openrouter.ai
             </a>{' '}
@@ -72,7 +72,7 @@ export const ApiKeyModal = ({ show, onClose, onSave, onDemoData }: ApiKeyModalPr
           </p>
 
           <div className="modal-footer">
-            <button type="button" onClick={onDemoData} className="btn-text" style={{ marginRight: 'auto' }}>
+            <button type="button" onClick={onDemoData} className="btn-text modal-demo-btn">
               Skip — load sample data
             </button>
             <button type="button" onClick={onClose} className="btn-secondary">

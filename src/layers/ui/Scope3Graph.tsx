@@ -233,7 +233,7 @@ export const Scope3Graph: React.FC<{ data: SupplyChainNode[] }> = ({ data }) => 
   return (
     <div
       ref={containerRef}
-      style={{ width: '100%', height: '100%', position: 'relative' }}
+      className="scope3-container"
     >
       <svg
         ref={d3Container}
@@ -244,26 +244,13 @@ export const Scope3Graph: React.FC<{ data: SupplyChainNode[] }> = ({ data }) => 
       />
       {tooltip && (
         <div
-          style={{
-            position: 'fixed',
-            left: tooltip.x + 14,
-            top: tooltip.y - 32,
-            background: 'var(--surface-color)',
-            border: '1px solid var(--border-color)',
-            borderRadius: '8px',
-            padding: '8px 12px',
-            fontSize: '12px',
-            color: 'var(--text-primary)',
-            pointerEvents: 'none',
-            zIndex: 1000,
-            boxShadow: '0 4px 16px rgba(0,0,0,0.4)',
-            minWidth: '140px',
-          }}
+          className="scope3-tooltip"
+          style={{ left: tooltip.x + 14, top: tooltip.y - 32 }}
         >
-          <strong style={{ display: 'block', marginBottom: '4px' }}>
+          <strong className="scope3-tooltip-name">
             {tooltip.name}
           </strong>
-          <span style={{ color: 'var(--text-secondary)' }}>
+          <span className="scope3-tooltip-detail">
             {tooltip.factor} {tooltip.unit}
           </span>
         </div>

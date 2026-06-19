@@ -59,7 +59,7 @@ export const CO2Clock: React.FC<{ initialPpm?: number; compact?: boolean }> = ({
   const hiddenAriaLabel = (
     <div 
       aria-live="polite" 
-      style={{ position: 'absolute', width: '1px', height: '1px', padding: 0, margin: '-1px', overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: 0 }}
+      className="sr-only"
     >
       {`Current atmospheric CO2 is ${announcedPpm.toFixed(3)} parts per million`}
     </div>
@@ -67,11 +67,11 @@ export const CO2Clock: React.FC<{ initialPpm?: number; compact?: boolean }> = ({
 
   if (compact) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', position: 'relative' }}>
+      <div className="co2clock-compact">
         {hiddenAriaLabel}
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }} aria-hidden="true">
+        <div className="co2clock-compact-display" aria-hidden="true">
           <span className="text-caption">LIVE CO₂</span>
-          <span className={`text-hero-number ${tick ? 'animate-tick' : ''}`} style={{ fontSize: '1.5rem', margin: 0, lineHeight: 1 }}>
+          <span className={`text-hero-number co2clock-compact-value ${tick ? 'animate-tick' : ''}`}>
             {ppm.toFixed(4)}
           </span>
         </div>
@@ -80,19 +80,16 @@ export const CO2Clock: React.FC<{ initialPpm?: number; compact?: boolean }> = ({
   }
 
   return (
-    <div 
-      className="glass-panel" 
-      style={{ padding: '1.5rem', textAlign: 'center', minWidth: '250px', position: 'relative' }}
-    >
+    <div className="glass-panel co2clock-full">
       {hiddenAriaLabel}
       <div aria-hidden="true">
-        <h3 className="text-caption" style={{ margin: 0 }}>
+        <h3 className="text-caption co2clock-label">
           Live Atmospheric CO₂
         </h3>
-        <div className={`text-hero-number ${tick ? 'animate-tick' : ''}`} style={{ margin: '0.5rem 0' }}>
+        <div className={`text-hero-number co2clock-value ${tick ? 'animate-tick' : ''}`}>
           {ppm.toFixed(4)} <span className="text-body">ppm</span>
         </div>
-        <p className="text-caption" style={{ margin: 0 }}>
+        <p className="text-caption co2clock-source">
           Baseline: NOAA Global Monitoring
         </p>
       </div>
